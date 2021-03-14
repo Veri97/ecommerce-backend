@@ -1,3 +1,4 @@
+using ECommerce.API.Helpers;
 using ECommerce.Core.Interfaces;
 using ECommerce.Infrastructure.Data;
 using ECommerce.Infrastructure.Repositories;
@@ -32,6 +33,8 @@ namespace ECommerce.API
             services.AddScoped<IProductRepository,ProductRepository>();
             services.AddScoped(typeof(IGenericRepository<>),typeof(GenericRepository<>));
 
+            services.AddAutoMapper(typeof(MappingProfiles));
+
             services.AddControllers();
 
             services.AddSwaggerGen(c =>
@@ -55,6 +58,8 @@ namespace ECommerce.API
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseStaticFiles();
 
             app.UseAuthorization();
 
