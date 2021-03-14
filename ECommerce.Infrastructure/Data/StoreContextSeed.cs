@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -16,40 +17,40 @@ namespace ECommerce.Infrastructure.Data
         {
             try
             {
-                if(!(await context.ProductBrands.AnyAsync()))
+                if(!context.ProductBrands.Any())
                 {
                     var brandsData = File.ReadAllText("../ECommerce.Infrastructure/Data/SeedData/brands.json");
                     var brands = JsonSerializer.Deserialize<List<ProductBrand>>(brandsData);
 
                     foreach(var item in brands)
                     {
-                        await context.ProductBrands.AddAsync(item);
+                        context.ProductBrands.AddRange(item);
                     }
 
                     await context.SaveChangesAsync();
                 }
 
-                if (!(await context.ProductTypes.AnyAsync()))
+                if (!context.ProductTypes.Any())
                 {
                     var typesData = File.ReadAllText("../ECommerce.Infrastructure/Data/SeedData/types.json");
                     var types = JsonSerializer.Deserialize<List<ProductType>>(typesData);
 
                     foreach (var item in types)
                     {
-                        await context.ProductTypes.AddAsync(item);
+                        context.ProductTypes.AddRange(item);
                     }
 
                     await context.SaveChangesAsync();
                 }
 
-                if (!(await context.Products.AnyAsync()))
+                if (!context.Products.Any())
                 {
                     var productsData = File.ReadAllText("../ECommerce.Infrastructure/Data/SeedData/products.json");
                     var products = JsonSerializer.Deserialize<List<Product>>(productsData);
 
                     foreach (var item in products)
                     {
-                        await context.Products.AddAsync(item);
+                       context.Products.AddRange(item);
                     }
 
                     await context.SaveChangesAsync();
