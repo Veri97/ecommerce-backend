@@ -1,4 +1,6 @@
+using ECommerce.API.Errors;
 using ECommerce.API.Helpers;
+using ECommerce.API.Middleware;
 using ECommerce.Core.Interfaces;
 using ECommerce.Infrastructure.Data;
 using ECommerce.Infrastructure.Repositories;
@@ -43,17 +45,39 @@ namespace ECommerce.API
             });
             services.AddDbContext<StoreContext>(x => x.UseSqlite(
                             _config.GetConnectionString("DefaultConnection")));
+
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = actionContext =>
+                {
+                    var errors = actionContext.ModelState
+                                  .Where(e => e.Value.Errors.Count > 0)
+                                  .SelectMany(x => x.Value.Errors)
+                                  .Select(x => x.ErrorMessage)
+                                  .ToArray();
+
+                    var errorResponse = new ApiValidationErrorResponse
+                    {
+                        Errors = errors
+                    };
+
+                    return new BadRequestObjectResult(errorResponse);
+                };
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ECommerce.API v1"));
-            }
+            app.UseMiddleware<ExceptionMiddleware>();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ECommerce.API v1"));
+            
+
+            //when a request comes in and the api does not have an endpoint to match, this middleware will redirect 
+            //to EndpointNotFoundControlle, where ApiResponse is returned for this case
+            app.UseStatusCodePagesWithReExecute("/errors/{0}");
 
             app.UseHttpsRedirection();
 
