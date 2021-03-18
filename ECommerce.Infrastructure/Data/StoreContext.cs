@@ -31,7 +31,7 @@ namespace ECommerce.Infrastructure.Data
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
             /*workaround for Sqlite database to convert decimal types into double
-            (because Sqlite does not support decimals*/
+            (because Sqlite does not support decimals)*/
             if(Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite")
             {
                 foreach(var entityType in modelBuilder.Model.GetEntityTypes())
